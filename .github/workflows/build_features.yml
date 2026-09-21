@@ -1,0 +1,47 @@
+
+name: Build CryptoAI Training Data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+
+    steps:
+      - name: Download project files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install AI data packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3"
+
+      - name: Select high liquidity coins
+        run: python select_coins.py
+
+      - name: Download historical market data
+        run: python download_history.py
+
+      - name: Build AI features
+        run: python build_features.py
+
+      - name: Upload training data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-training-data
+          path: |
+            training/
+            output/history_download_report.csv
+            output/selected_coins.csv
+            output/rejected_coins.csv
+          if-no-files-found: warn
+          retention-days: 7
