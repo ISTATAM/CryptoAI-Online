@@ -34,8 +34,8 @@ OUTPUT_FOLDER = Path("output")
 
 EXCLUDED_ASSETS = {
     "USDT", "USDC", "FDUSD", "TUSD", "USDP",
-    "DAI", "EUR", "TRY", "BRL", "GBP",
-    "AUD", "JPY"
+    "DAI", "USD1", "PYUSD", "RLUSD", "USDD",
+    "EUR", "TRY", "BRL", "GBP", "AUD", "JPY"
 }
 
 
