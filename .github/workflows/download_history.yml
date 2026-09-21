@@ -1,0 +1,40 @@
+
+name: Download CryptoAI History
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+
+    steps:
+      - name: Download project files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Select high liquidity coins
+        run: python select_coins.py
+
+      - name: Download historical market data
+        run: python download_history.py
+
+      - name: Upload historical data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-history
+          path: |
+            output/cryptoai_history.zip
+            output/history_download_report.csv
+            output/selected_coins.csv
+            output/rejected_coins.csv
+            output/summary.json
+          if-no-files-found: warn
+          retention-days: 7
