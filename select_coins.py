@@ -38,7 +38,6 @@ EXCLUDED_ASSETS = {
     "EUR", "TRY", "BRL", "GBP", "AUD", "JPY"
 }
 
-
 def get_json(endpoint, params=""):
 
     url = BASE_URL + endpoint + params
