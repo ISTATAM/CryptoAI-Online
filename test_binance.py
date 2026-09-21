@@ -2,67 +2,68 @@ import json
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
-API_TESTS = {
-    "Binance Global": (
-        "https://api.binance.com/api/v3/time"
-    ),
-    "Binance Data": (
-        "https://data-api.binance.vision/api/v3/time"
-    ),
-    "Binance US": (
-        "https://api.binance.us/api/v3/time"
-    ),
-    "CoinGecko": (
-        "https://api.coingecko.com/api/v3/ping"
-    ),
-}
+BASE_URL = "https://data-api.binance.vision"
 
 
-def test_api(name, url):
+def get_json(endpoint):
 
-    print()
-    print("=" * 50)
-    print(f"測試：{name}")
-    print(f"網址：{url}")
+    url = BASE_URL + endpoint
 
     request = Request(
         url,
         headers={
             "User-Agent": "CryptoAI-Online/1.0",
-            "Accept": "application/json",
-        },
+            "Accept": "application/json"
+        }
     )
+
+    with urlopen(request, timeout=30) as response:
+        return json.load(response)
+
+
+def test_api(name, endpoint):
+
+    print()
+    print("=" * 60)
+    print("測試：", name)
 
     try:
 
-        with urlopen(request, timeout=20) as response:
+        data = get_json(endpoint)
 
-            data = json.load(response)
+        print("結果：SUCCESS")
 
-            print("結果：SUCCESS")
-            print("HTTP：", response.status)
-            print("資料：", data)
+        if isinstance(data, list):
+
+            print("取得資料數量：", len(data))
+
+            if len(data) > 0:
+                print("第一筆資料：", data[0])
+
+        elif isinstance(data, dict):
+
+            if "symbols" in data:
+
+                print(
+                    "交易對數量：",
+                    len(data["symbols"])
+                )
+
+            else:
+
+                print("資料：", data)
 
     except HTTPError as error:
 
         print("結果：FAILED")
         print("HTTP：", error.code)
 
-        try:
-            print(
-                "原因：",
-                error.read().decode(
-                    "utf-8",
-                    errors="replace"
-                )[:500]
-            )
-        except Exception:
-            pass
-
-    except URLError as error:
-
-        print("結果：FAILED")
-        print("原因：", error.reason)
+        print(
+            error.read().decode(
+                "utf-8",
+                errors="replace"
+            )[:500]
+        )
 
     except Exception as error:
 
@@ -72,15 +73,37 @@ def test_api(name, url):
 
 def main():
 
-    print("CryptoAI Online - 雲端 API 連線診斷")
+    print("CryptoAI Online - Binance 市場資料測試")
 
-    for name, url in API_TESTS.items():
+    test_api(
+        "BTC 15分鐘 K線",
+        "/api/v3/klines"
+        "?symbol=BTCUSDT"
+        "&interval=15m"
+        "&limit=5"
+    )
 
-        test_api(name, url)
+    test_api(
+        "BTC 4小時 K線",
+        "/api/v3/klines"
+        "?symbol=BTCUSDT"
+        "&interval=4h"
+        "&limit=5"
+    )
+
+    test_api(
+        "全部交易對",
+        "/api/v3/exchangeInfo"
+    )
+
+    test_api(
+        "全部幣種24H成交額",
+        "/api/v3/ticker/24hr"
+    )
 
     print()
-    print("=" * 50)
-    print("全部測試完成")
+    print("=" * 60)
+    print("市場資料測試完成")
 
 
 if __name__ == "__main__":
