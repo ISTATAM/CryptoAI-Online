@@ -1,0 +1,29 @@
+name: Select High Liquidity Coins
+
+on:
+  workflow_dispatch:
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+      - name: Download project files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Select coins
+        run: python select_coins.py
+
+      - name: Upload selection results
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-selected-coins
+          path: output/
+          if-no-files-found: error
