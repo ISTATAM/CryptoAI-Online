@@ -1,0 +1,66 @@
+name: CryptoAI V7 Strict Validation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 120
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3" "scikit-learn>=1.5,<2"
+
+      - name: Select coins
+        run: python select_coins.py
+
+      - name: Download fixed dataset
+        run: python download_history.py
+
+      - name: Build fixed training dataset
+        run: python build_features.py
+
+      - name: Save dataset fingerprint
+        run: |
+          sha256sum training/training_15m.csv > dataset_sha256.txt
+          sha256sum training/training_4h.csv >> dataset_sha256.txt
+          sha256sum training/training_1d.csv >> dataset_sha256.txt
+
+      - name: Run V7 strict validation
+        run: python backtest_v7.py
+
+      - name: Upload V7 fixed dataset
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-v7-fixed-dataset
+          path: |
+            training/
+            output/selected_coins.csv
+            output/history_download_report.csv
+            dataset_sha256.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload V7 reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-v7-reports
+          path: |
+            v7_reports/
+            dataset_sha256.txt
+          if-no-files-found: warn
+          retention-days: 7
