@@ -1,0 +1,53 @@
+
+name: CryptoAI V6 Stress Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stress-test:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 120
+
+    steps:
+      - name: Download project files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install AI packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3" "scikit-learn>=1.5,<2"
+
+      - name: Select high liquidity coins
+        run: python select_coins.py
+
+      - name: Download historical data
+        run: python download_history.py
+
+      - name: Build training data
+        run: python build_features.py
+
+      - name: Generate V5 predictions
+        run: python backtest_portfolio.py
+
+      - name: Run V6 stress test
+        run: python stress_test_v6.py
+
+      - name: Upload V6 reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-v6-reports
+          path: |
+            v6_reports/
+            backtest_reports/v5_summary.json
+            training/training_summary.json
+            output/selected_coins.csv
+          if-no-files-found: warn
+          retention-days: 7
