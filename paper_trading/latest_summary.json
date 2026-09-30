@@ -1,10 +1,10 @@
 {
   "version": "V9-2",
-  "recorded_at_utc": "2026-09-30T04:48:46.604098+00:00",
+  "recorded_at_utc": "2026-09-30T05:38:24.637120+00:00",
   "interval": "1d",
   "threshold": 0.7,
-  "liquid_symbols": 205,
-  "successful_scans": 200,
+  "liquid_symbols": 204,
+  "successful_scans": 199,
   "failures": 5,
   "new_signal_candidates": 0,
   "top_predictions": [
@@ -61,12 +61,12 @@
   ],
   "failed_symbols": [
     {
-      "symbol": "MARSCOINUSDT",
-      "error": "完整歷史 K 線不足：26"
-    },
-    {
       "symbol": "HYPEUSDT",
       "error": "完整歷史 K 線不足：6"
+    },
+    {
+      "symbol": "MARSCOINUSDT",
+      "error": "完整歷史 K 線不足：26"
     },
     {
       "symbol": "牛来USDT",
