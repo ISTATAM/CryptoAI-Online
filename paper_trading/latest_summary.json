@@ -1,0 +1,84 @@
+{
+  "version": "V9-2",
+  "recorded_at_utc": "2026-09-30T04:48:46.604098+00:00",
+  "interval": "1d",
+  "threshold": 0.7,
+  "liquid_symbols": 205,
+  "successful_scans": 200,
+  "failures": 5,
+  "new_signal_candidates": 0,
+  "top_predictions": [
+    {
+      "symbol": "CBRSBUSDT",
+      "ai_score": 0.6880945463365293,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "ARUSDT",
+      "ai_score": 0.6310523425603944,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "BOMEUSDT",
+      "ai_score": 0.6293240093118656,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "0GUSDT",
+      "ai_score": 0.5839369574797598,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "ai_score": 0.5812479899233436,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "CHZUSDT",
+      "ai_score": 0.5745219665770798,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "ACEUSDT",
+      "ai_score": 0.5735954178386032,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "NEIROUSDT",
+      "ai_score": 0.5704313467371118,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "SNDKBUSDT",
+      "ai_score": 0.5676256288879927,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    },
+    {
+      "symbol": "ZROUSDT",
+      "ai_score": 0.553595841499715,
+      "signal_open_time": "2026-09-29 00:00:00+00:00"
+    }
+  ],
+  "failed_symbols": [
+    {
+      "symbol": "MARSCOINUSDT",
+      "error": "完整歷史 K 線不足：26"
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "error": "完整歷史 K 線不足：6"
+    },
+    {
+      "symbol": "牛来USDT",
+      "error": "完整歷史 K 線不足：21"
+    },
+    {
+      "symbol": "BNCBUSDT",
+      "error": "完整歷史 K 線不足：16"
+    },
+    {
+      "symbol": "BMNRBUSDT",
+      "error": "完整歷史 K 線不足：56"
+    }
+  ]
+}
