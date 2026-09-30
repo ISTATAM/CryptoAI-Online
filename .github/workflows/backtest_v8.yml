@@ -1,0 +1,83 @@
+name: CryptoAI V8 Tradable Target
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3" "scikit-learn>=1.5,<2"
+
+      - name: Find latest successful V7 run
+        id: find-v7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_ID=$(gh run list \
+            --workflow "backtest_v7.yml" \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+            echo "找不到成功的 V7 執行紀錄"
+            exit 1
+          fi
+
+          echo "找到 V7 Run ID: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download V7 fixed dataset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download \
+            "${{ steps.find-v7.outputs.run_id }}" \
+            --name cryptoai-v7-fixed-dataset \
+            --dir v7_fixed
+
+      - name: Restore fixed training dataset
+        run: |
+          mkdir -p training
+          cp -r v7_fixed/training/. training/
+
+          echo "固定資料集："
+          cat v7_fixed/dataset_sha256.txt
+
+          echo "重新驗證 SHA256："
+          sha256sum training/training_15m.csv
+          sha256sum training/training_4h.csv
+          sha256sum training/training_1d.csv
+
+      - name: Run V8 tradable target backtest
+        run: python backtest_v8.py
+
+      - name: Upload V8 reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptoai-v8-reports
+          path: |
+            v8_reports/
+            v7_fixed/dataset_sha256.txt
+          if-no-files-found: warn
+          retention-days: 7
