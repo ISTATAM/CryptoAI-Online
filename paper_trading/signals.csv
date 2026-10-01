@@ -1,0 +1,2 @@
+﻿recorded_at_utc,interval,symbol,signal_open_time,signal_close,ai_score,quote_volume_24h,threshold,status,entry_time,entry_price,exit_time,exit_price,gross_return,net_return_cost_0_2,net_return_cost_0_3,net_return_cost_0_5,direction_correct,closed_at_utc
+2026-10-01T05:26:00.059406+00:00,1d,SOXSBUSDT,2026-09-30 00:00:00+00:00,32.84,0.702347873410352,1849409.1656,0.7,WAIT_ENTRY,,,,,,,,,,
