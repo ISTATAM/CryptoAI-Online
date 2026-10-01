@@ -104,6 +104,7 @@ jobs:
         run: |
           python -m py_compile v9_paper_trade.py
           python -m py_compile v9_settle_paper_trades.py
+          python -m py_compile v9_performance_report.py
 
       # ======================================================
       # 6. V9-3
@@ -154,7 +155,18 @@ jobs:
           python v9_settle_paper_trades.py
 
       # ======================================================
-      # 9. 把 Paper Trading 紀錄永久存回 GitHub
+      # 9. V9-4 自動更新 Forward Test 戰績
+      # ======================================================
+      - name: Build V9 performance report
+        run: |
+          echo "======================================"
+          echo "更新 V9 Forward Test 戰績"
+          echo "======================================"
+
+          python v9_performance_report.py
+
+      # ======================================================
+      # 10. 把 Paper Trading 紀錄永久存回 GitHub
       # ======================================================
       - name: Save paper trading history
         run: |
@@ -186,7 +198,7 @@ jobs:
           echo "======================================"
 
       # ======================================================
-      # 10. 同時保存 Artifact
+      # 11. 同時保存 Artifact
       # ======================================================
       - name: Upload latest V9 report
         if: always()
