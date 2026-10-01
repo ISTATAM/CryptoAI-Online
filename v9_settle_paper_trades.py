@@ -1,134 +1,202 @@
-name: CryptoAI V9 Paper Trading
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
-on:
-  workflow_dispatch:
+import pandas as pd
 
-  schedule:
-    # Binance 1D K線 UTC 00:00 收盤後，
-    # 預留 15 分鐘再執行。
-    - cron: '15 0 * * *'
+BASE_URL = "https://data-api.binance.vision"
+SIGNAL_FILE = Path("paper_trading/signals.csv")
+SUMMARY_FILE = Path("paper_trading/settlement_summary.json")
+COSTS = {"0_2": 0.002, "0_3": 0.003, "0_5": 0.005}
 
-permissions:
-  actions: read
-  contents: write
 
-concurrency:
-  group: cryptoai-v9-paper-trading
-  cancel-in-progress: false
+def api_get(path, params=None):
+    url = BASE_URL + path
+    if params:
+        url += "?" + urlencode(params)
+    req = Request(url, headers={"User-Agent": "CryptoAI-V9-Settlement/1.0"})
+    with urlopen(req, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
 
-jobs:
-  paper-trade:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
 
-    steps:
-      - name: Download project
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+def get_daily_kline(symbol, open_time):
+    target = pd.to_datetime(open_time, utc=True)
+    start_ms = int(target.timestamp() * 1000)
+    raw = api_get("/api/v3/klines", {
+        "symbol": symbol,
+        "interval": "1d",
+        "startTime": start_ms,
+        "limit": 1,
+    })
+    if not raw:
+        return None
+    k = raw[0]
+    actual_open = pd.to_datetime(int(k[0]), unit="ms", utc=True)
+    if actual_open != target:
+        return None
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    if int(k[6]) >= now_ms:
+        return None
+    return {
+        "open_time": actual_open,
+        "close_time": pd.to_datetime(int(k[6]), unit="ms", utc=True),
+        "close": float(k[4]),
+    }
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
 
-      - name: Install packages
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3" "scikit-learn>=1.5,<2"
+def ensure_columns(df):
+    defaults = {
+        "entry_time": "", "entry_price": "", "exit_time": "", "exit_price": "",
+        "gross_return": "", "net_return_cost_0_2": "", "net_return_cost_0_3": "",
+        "net_return_cost_0_5": "", "direction_correct": "", "closed_at_utc": "",
+    }
+    for col, default in defaults.items():
+        if col not in df.columns:
+            df[col] = default
+    return df
 
-      - name: Find V9 production model
-        id: find-model
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          RUN_ID=$(gh run list \
-            --workflow "build_v9_model.yml" \
-            --status success \
-            --limit 1 \
-            --json databaseId \
-            --jq '.[0].databaseId')
 
-          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
-            echo "找不到成功的 V9 Production Model"
-            exit 1
-          fi
+def write_summary(payload):
+    SUMMARY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with SUMMARY_FILE.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
-          echo "V9 Model Run ID: $RUN_ID"
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Download locked V9 model
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p v9_model
+def main():
+    print("=" * 70)
+    print("CryptoAI V9-3 Settlement Engine")
+    print("=" * 70)
 
-          gh run download \
-            "${{ steps.find-model.outputs.run_id }}" \
-            --name cryptoai-v9-production-model \
-            --dir downloaded_model
+    if not SIGNAL_FILE.exists():
+        print("目前還沒有 signals.csv，本次不需要結算。")
+        write_summary({
+            "version": "V9-3",
+            "settled_at_utc": datetime.now(timezone.utc).isoformat(),
+            "message": "No signals.csv yet",
+            "status_counts": {},
+            "statistics": {"closed_trades": 0},
+            "errors": [],
+        })
+        return
 
-          cp -r downloaded_model/. v9_model/
+    df = pd.read_csv(SIGNAL_FILE, dtype=str, keep_default_na=False)
+    if df.empty:
+        print("signals.csv 為空，本次沒有交易需要處理。")
+        write_summary({
+            "version": "V9-3",
+            "settled_at_utc": datetime.now(timezone.utc).isoformat(),
+            "message": "signals.csv is empty",
+            "status_counts": {},
+            "statistics": {"closed_trades": 0},
+            "errors": [],
+        })
+        return
 
-          echo "正式模型："
-          ls -lh v9_model/
+    df = ensure_columns(df)
+    entry_updates = closed_updates = waiting_entry = waiting_exit = already_closed = 0
+    errors = []
 
-          echo ""
-          echo "模型 SHA256："
-          cat v9_model/model_sha256.txt
+    for index, row in df.iterrows():
+        status = row["status"].strip()
+        symbol = row["symbol"].strip()
+        try:
+            signal_time = pd.to_datetime(row["signal_open_time"], utc=True)
+            entry_time = signal_time + pd.Timedelta(days=1)
+            exit_time = signal_time + pd.Timedelta(days=2)
 
-      # ======================================================
-      # 先處理昨天以前留下來的 Paper Trade
-      # ======================================================
+            if status == "WAIT_ENTRY":
+                entry = get_daily_kline(symbol, entry_time)
+                if entry is None:
+                    waiting_entry += 1
+                    print(f"{symbol:12s} WAIT_ENTRY")
+                    continue
+                df.at[index, "entry_time"] = str(entry["open_time"])
+                df.at[index, "entry_price"] = str(entry["close"])
+                df.at[index, "status"] = "WAIT_EXIT"
+                status = "WAIT_EXIT"
+                entry_updates += 1
+                print(f"{symbol:12s} ENTRY = {entry['close']}")
 
-      - name: Settle existing paper trades
-        run: python v9_settle_paper_trades.py
+            if status == "WAIT_EXIT":
+                entry_text = str(df.at[index, "entry_price"]).strip()
+                if not entry_text:
+                    entry = get_daily_kline(symbol, entry_time)
+                    if entry is None:
+                        waiting_entry += 1
+                        continue
+                    entry_price = float(entry["close"])
+                    df.at[index, "entry_time"] = str(entry["open_time"])
+                    df.at[index, "entry_price"] = str(entry_price)
+                else:
+                    entry_price = float(entry_text)
 
-      # ======================================================
-      # 再掃描今天最新完成的 1D K線
-      # ======================================================
+                exit_k = get_daily_kline(symbol, exit_time)
+                if exit_k is None:
+                    waiting_exit += 1
+                    print(f"{symbol:12s} WAIT_EXIT")
+                    continue
 
-      - name: Run V9 paper trading scanner
-        run: python v9_paper_trade.py
+                exit_price = float(exit_k["close"])
+                gross = exit_price / entry_price - 1
+                df.at[index, "exit_time"] = str(exit_k["open_time"])
+                df.at[index, "exit_price"] = str(exit_price)
+                df.at[index, "gross_return"] = str(gross)
+                df.at[index, "net_return_cost_0_2"] = str(gross - COSTS["0_2"])
+                df.at[index, "net_return_cost_0_3"] = str(gross - COSTS["0_3"])
+                df.at[index, "net_return_cost_0_5"] = str(gross - COSTS["0_5"])
+                df.at[index, "direction_correct"] = "TRUE" if gross > 0 else "FALSE"
+                df.at[index, "closed_at_utc"] = datetime.now(timezone.utc).isoformat()
+                df.at[index, "status"] = "CLOSED"
+                closed_updates += 1
+                print(f"{symbol:12s} CLOSED Gross {gross:+.2%}")
+            elif status == "CLOSED":
+                already_closed += 1
+        except Exception as exc:
+            errors.append({"symbol": symbol, "error": str(exc)})
+            print(f"{symbol:12s} ERROR: {exc}")
 
-      # ======================================================
-      # 再結算一次
-      #
-      # 正常新訊號不會立刻成交。
-      # 這一步主要用來增加中斷恢復能力。
-      # ======================================================
+    df.to_csv(SIGNAL_FILE, index=False, encoding="utf-8-sig")
+    status_counts = df["status"].value_counts().to_dict()
+    closed = df[df["status"] == "CLOSED"].copy()
+    stats = {"closed_trades": int(len(closed)), "win_rate_gross": None,
+             "average_net_0_2": None, "average_net_0_3": None, "average_net_0_5": None}
+    if not closed.empty:
+        gross = pd.to_numeric(closed["gross_return"], errors="coerce")
+        n02 = pd.to_numeric(closed["net_return_cost_0_2"], errors="coerce")
+        n03 = pd.to_numeric(closed["net_return_cost_0_3"], errors="coerce")
+        n05 = pd.to_numeric(closed["net_return_cost_0_5"], errors="coerce")
+        stats.update({
+            "win_rate_gross": float((gross > 0).mean()),
+            "average_net_0_2": float(n02.mean()),
+            "average_net_0_3": float(n03.mean()),
+            "average_net_0_5": float(n05.mean()),
+        })
 
-      - name: Recheck paper trade settlement
-        run: python v9_settle_paper_trades.py
+    write_summary({
+        "version": "V9-3",
+        "settled_at_utc": datetime.now(timezone.utc).isoformat(),
+        "entry_updates": entry_updates,
+        "closed_updates": closed_updates,
+        "waiting_entry": waiting_entry,
+        "waiting_exit": waiting_exit,
+        "already_closed": already_closed,
+        "status_counts": status_counts,
+        "statistics": stats,
+        "errors": errors,
+    })
 
-      # ======================================================
-      # 永久寫回 GitHub
-      # ======================================================
+    print("=" * 70)
+    print("V9-3 結算完成")
+    print(f"新增 ENTRY：{entry_updates}")
+    print(f"新增 CLOSED：{closed_updates}")
+    print(f"等待 ENTRY：{waiting_entry}")
+    print(f"等待 EXIT：{waiting_exit}")
+    print(f"目前 CLOSED：{len(closed)}")
+    print(f"錯誤：{len(errors)}")
+    print("=" * 70)
 
-      - name: Save paper trading history
-        run: |
-          git config user.name "CryptoAI V9 Bot"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add paper_trading/
-
-          if git diff --cached --quiet; then
-            echo "沒有新的 Paper Trading 資料"
-            exit 0
-          fi
-
-          git commit -m "Update V9 paper trading data"
-
-          git pull --rebase origin main
-
-          git push origin main
-
-      - name: Upload latest V9 report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cryptoai-v9-paper-trading-latest
-          path: |
-            paper_trading/
-          if-no-files-found: warn
-          retention-days: 30
+if __name__ == "__main__":
+    main()
