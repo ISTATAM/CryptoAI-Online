@@ -1,0 +1,41 @@
+{
+  "version": "V9-4",
+  "updated_at_utc": "2026-10-01T06:10:22.593868+00:00",
+  "rules": {
+    "initial_capital_usdt": 100.0,
+    "max_positions_per_exit_time": 5,
+    "position_fraction_of_starting_equity": 0.2,
+    "note": "Forward paper-trading performance; not live executable fills."
+  },
+  "total_signals": 1,
+  "status_counts": {
+    "WAIT_ENTRY": 1
+  },
+  "closed_trades": 0,
+  "performance_by_cost": {
+    "0.2%": {
+      "final_capital_usdt": 100.0,
+      "total_return_pct": 0.0,
+      "max_drawdown_pct": 0.0,
+      "trades_used": 0,
+      "win_rate_pct": null,
+      "average_trade_return_pct": null
+    },
+    "0.3%": {
+      "final_capital_usdt": 100.0,
+      "total_return_pct": 0.0,
+      "max_drawdown_pct": 0.0,
+      "trades_used": 0,
+      "win_rate_pct": null,
+      "average_trade_return_pct": null
+    },
+    "0.5%": {
+      "final_capital_usdt": 100.0,
+      "total_return_pct": 0.0,
+      "max_drawdown_pct": 0.0,
+      "trades_used": 0,
+      "win_rate_pct": null,
+      "average_trade_return_pct": null
+    }
+  }
+}
