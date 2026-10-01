@@ -3,6 +3,13 @@ name: CryptoAI V9 Paper Trading
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+    paths:
+      - 'v9_paper_trade.py'
+      - 'v9_settle_paper_trades.py'
+
   schedule:
     # Binance 1D K線以 UTC 為基準。
     # 每天 UTC 00:00 收盤後，預留 15 分鐘再執行。
@@ -99,6 +106,11 @@ jobs:
           echo "=============================="
 
           cat v9_model/model_sha256.txt
+
+      - name: Validate V9 Python scripts
+        run: |
+          python -m py_compile v9_paper_trade.py
+          python -m py_compile v9_settle_paper_trades.py
 
       # ======================================================
       # 6. V9-3
