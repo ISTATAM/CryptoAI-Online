@@ -118,26 +118,14 @@ jobs:
       # ======================================================
       # 4. 尋找已經封存的 V9 Production Model
       # ======================================================
-      - name: Find V9 production model
-        if: steps.daily-lock.outputs.skip != 'true'
+      - name: Pin V9 production model
         id: find-model
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          RUN_ID=$(gh run list \
-            --workflow "build_v9_model.yml" \
-            --status success \
-            --limit 1 \
-            --json databaseId \
-            --jq '.[0].databaseId')
-
-          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
-            echo "找不到成功的 V9 Production Model"
-            exit 1
-          fi
-
-          echo "找到 V9 Model Run ID: $RUN_ID"
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          # V9-6：Forward Test 必須永遠使用同一顆正式模型。
+          # 不再尋找「最新成功模型」，避免未來重跑訓練後偷偷換模型。
+          echo "run_id=36669776568" >> "$GITHUB_OUTPUT"
+          echo "鎖定 V9 Model Run ID: 36669776568"
 
       # ======================================================
       # 5. 下載封存模型
@@ -168,6 +156,19 @@ jobs:
           echo "=============================="
 
           cat v9_model/model_sha256.txt
+
+          EXPECTED_MODEL_SHA="ece817275f2ab9790d62532cbe24af595b2b175485f01b26850a96c03848ed7b"
+          ACTUAL_MODEL_SHA=$(sha256sum v9_model/cryptoai_v9_1d.pkl | awk '{print $1}')
+
+          echo "Expected: $EXPECTED_MODEL_SHA"
+          echo "Actual:   $ACTUAL_MODEL_SHA"
+
+          if [ "$ACTUAL_MODEL_SHA" != "$EXPECTED_MODEL_SHA" ]; then
+            echo "V9 正式模型 SHA256 不一致，停止執行。"
+            exit 1
+          fi
+
+          echo "V9 正式模型 SHA256 驗證成功。"
 
       - name: Validate V9 Python scripts
         if: steps.daily-lock.outputs.skip != 'true'
