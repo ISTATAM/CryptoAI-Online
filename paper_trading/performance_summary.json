@@ -1,42 +1,43 @@
 {
   "version": "V9-4",
-  "updated_at_utc": "2026-10-02T07:09:24.877574+00:00",
+  "updated_at_utc": "2026-10-03T05:27:50.912005+00:00",
   "rules": {
     "initial_capital_usdt": 100.0,
     "max_positions_per_exit_time": 5,
     "position_fraction_of_starting_equity": 0.2,
     "note": "Forward paper-trading performance; not live executable fills."
   },
-  "total_signals": 3,
+  "total_signals": 6,
   "status_counts": {
-    "WAIT_ENTRY": 2,
-    "WAIT_EXIT": 1
+    "WAIT_ENTRY": 3,
+    "WAIT_EXIT": 2,
+    "CLOSED": 1
   },
-  "closed_trades": 0,
+  "closed_trades": 1,
   "performance_by_cost": {
     "0.2%": {
-      "final_capital_usdt": 100.0,
-      "total_return_pct": 0.0,
-      "max_drawdown_pct": 0.0,
-      "trades_used": 0,
-      "win_rate_pct": null,
-      "average_trade_return_pct": null
+      "final_capital_usdt": 98.7246,
+      "total_return_pct": -1.2754,
+      "max_drawdown_pct": -1.2754,
+      "trades_used": 1,
+      "win_rate_pct": 0.0,
+      "average_trade_return_pct": -6.3768
     },
     "0.3%": {
-      "final_capital_usdt": 100.0,
-      "total_return_pct": 0.0,
-      "max_drawdown_pct": 0.0,
-      "trades_used": 0,
-      "win_rate_pct": null,
-      "average_trade_return_pct": null
+      "final_capital_usdt": 98.7046,
+      "total_return_pct": -1.2954,
+      "max_drawdown_pct": -1.2954,
+      "trades_used": 1,
+      "win_rate_pct": 0.0,
+      "average_trade_return_pct": -6.4768
     },
     "0.5%": {
-      "final_capital_usdt": 100.0,
-      "total_return_pct": 0.0,
-      "max_drawdown_pct": 0.0,
-      "trades_used": 0,
-      "win_rate_pct": null,
-      "average_trade_return_pct": null
+      "final_capital_usdt": 98.6646,
+      "total_return_pct": -1.3354,
+      "max_drawdown_pct": -1.3354,
+      "trades_used": 1,
+      "win_rate_pct": 0.0,
+      "average_trade_return_pct": -6.6768
     }
   }
 }
