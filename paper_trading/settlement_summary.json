@@ -1,22 +1,22 @@
 {
   "version": "V9-3",
-  "settled_at_utc": "2026-10-04T06:03:40.117891+00:00",
+  "settled_at_utc": "2026-10-05T05:51:19.994864+00:00",
   "entry_updates": 0,
   "closed_updates": 0,
-  "waiting_entry": 2,
-  "waiting_exit": 3,
-  "already_closed": 3,
+  "waiting_entry": 1,
+  "waiting_exit": 2,
+  "already_closed": 6,
   "status_counts": {
-    "CLOSED": 3,
-    "WAIT_EXIT": 3,
-    "WAIT_ENTRY": 2
+    "CLOSED": 6,
+    "WAIT_EXIT": 2,
+    "WAIT_ENTRY": 1
   },
   "statistics": {
-    "closed_trades": 3,
-    "win_rate_gross": 0.0,
-    "average_net_0_2": -0.023406563119693136,
-    "average_net_0_3": -0.024406563119693137,
-    "average_net_0_5": -0.026406563119693128
+    "closed_trades": 6,
+    "win_rate_gross": 0.3333333333333333,
+    "average_net_0_2": -0.0038345850770639344,
+    "average_net_0_3": -0.004834585077063919,
+    "average_net_0_5": -0.006834585077063915
   },
   "errors": []
 }
