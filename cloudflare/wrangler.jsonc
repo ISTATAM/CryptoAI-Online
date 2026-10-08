@@ -1,0 +1,29 @@
+{
+  "name": "cryptoai-line-webhook",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-08",
+  "workers_dev": true,
+  "vars": {
+    "GH_OWNER": "ISTATAM",
+    "GH_REPO": "CryptoAI-Online",
+    "GH_WORKFLOW": "v9_paper_trade.yml",
+    "GH_BRANCH": "main",
+    "NOTIFY_DAILY_SUMMARY": "true"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NOTIFY_STATE",
+        "class_name": "NotificationState"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v10-notification-state-1",
+      "new_sqlite_classes": [
+        "NotificationState"
+      ]
+    }
+  ]
+}
