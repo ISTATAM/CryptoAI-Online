@@ -4,12 +4,6 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Binance 1D K線以 UTC 為基準。
-    # 每天 UTC 00:00 收盤後，預留 15 分鐘再執行。
-    # 台灣時間約每天 08:15。
-    # V9-5：多重備援排程。GitHub schedule 可能延遲或漏跑，
-    # 因此在日 K 收盤後安排數個錯開時段。
-    # UTC 00:17 / 01:23 / 02:37 / 04:43
     # 台灣時間約 08:17 / 09:23 / 10:37 / 12:43。
     - cron: '17 0 * * *'
     - cron: '23 1 * * *'
@@ -30,22 +24,13 @@ jobs:
     timeout-minutes: 60
 
     steps:
-
-      # ======================================================
-      # 1. 下載 GitHub 專案
-      # ======================================================
+      # 1. 下載專案
       - name: Download project
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ======================================================
-      # V9-5：備援排程每日成功鎖
-      #
-      # schedule 觸發時，如果今天（UTC）已經成功掃描過
-      # 最新完成的 1D K 線，就跳過後續工作。
-      # 手動 workflow_dispatch 永遠允許執行，方便測試。
-      # ======================================================
+      # 2. 檢查每日掃描鎖
       - name: Check daily schedule lock
         id: daily-lock
         shell: bash
@@ -66,28 +51,53 @@ jobs:
 
           if p.exists():
               try:
-                  data = json.loads(p.read_text(encoding="utf-8-sig"))
+                  data = json.loads(
+                      p.read_text(encoding="utf-8-sig")
+                  )
                   recorded = data.get("recorded_at_utc")
+
                   if recorded:
-                      run_time = datetime.fromisoformat(recorded.replace("Z", "+00:00"))
+                      run_time = datetime.fromisoformat(
+                          recorded.replace("Z", "+00:00")
+                      )
                       now = datetime.now(timezone.utc)
-                      # Binance 1D：現在 UTC 日期的上一天，是最新應處理完成日 K。
-                      expected_signal_day = (now - timedelta(days=1)).date()
+                      expected_signal_day = (
+                          now - timedelta(days=1)
+                      ).date()
+
                       top = data.get("top_predictions") or []
                       signal_days = set()
+
                       for row in top:
                           value = row.get("signal_open_time")
                           if value:
-                              signal_days.add(datetime.fromisoformat(value.replace("Z", "+00:00")).date())
-                      if run_time.date() == now.date() and expected_signal_day in signal_days:
-                          skip = True
-              except Exception as exc:
-                  print(f"讀取每日鎖失敗，為安全起見繼續執行：{exc}")
+                              signal_days.add(
+                                  datetime.fromisoformat(
+                                      value.replace("Z", "+00:00")
+                                  ).date()
+                              )
 
-          with open("/tmp/v9_skip.txt", "w", encoding="utf-8") as f:
+                      if (
+                          run_time.date() == now.date()
+                          and expected_signal_day in signal_days
+                      ):
+                          skip = True
+
+              except Exception as exc:
+                  print(
+                      f"讀取每日鎖失敗，繼續執行：{exc}"
+                  )
+
+          with open(
+              "/tmp/v9_skip.txt", "w", encoding="utf-8"
+          ) as f:
               f.write("true" if skip else "false")
 
-          print("今日已完成，跳過備援排程。" if skip else "今日尚未完成，繼續執行。")
+          print(
+              "今日已完成，跳過備援掃描。"
+              if skip
+              else "今日尚未完成，繼續掃描。"
+          )
           PY
 
           echo "skip=$(cat /tmp/v9_skip.txt)" >> "$GITHUB_OUTPUT"
@@ -95,41 +105,32 @@ jobs:
       - name: Stop duplicate scheduled run
         if: steps.daily-lock.outputs.skip == 'true'
         run: |
-          echo "V9-5：今天最新完成的 1D K 線已掃描，這次備援排程不重複執行。"
+          echo "今天最新完成的日 K 已掃描。"
+          echo "跳過重複掃描，仍會檢查 LINE 通知。"
 
-      # ======================================================
-      # 2. 安裝 Python
-      # ======================================================
+      # 3. 安裝 Python
+      # 跳過掃描時仍需要 Python 執行通知程式。
       - name: Install Python
-        if: steps.daily-lock.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # ======================================================
-      # 3. 安裝套件
-      # ======================================================
+      # 4. 安裝掃描套件
       - name: Install packages
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
           python -m pip install --upgrade pip
           python -m pip install "numpy>=1.26,<3" "pandas>=2.2,<3" "scikit-learn>=1.5,<2"
 
-      # ======================================================
-      # 4. 尋找已經封存的 V9 Production Model
-      # ======================================================
+      # 5. 固定正式模型
       - name: Pin V9 production model
         id: find-model
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          # V9-6：Forward Test 必須永遠使用同一顆正式模型。
-          # 不再尋找「最新成功模型」，避免未來重跑訓練後偷偷換模型。
           echo "run_id=36669776568" >> "$GITHUB_OUTPUT"
           echo "鎖定 V9 Model Run ID: 36669776568"
 
-      # ======================================================
-      # 5. 下載封存模型
-      # ======================================================
+      # 6. 下載模型並驗證 SHA256
       - name: Download locked V9 model
         if: steps.daily-lock.outputs.skip != 'true'
         env:
@@ -144,17 +145,10 @@ jobs:
 
           cp -r downloaded_model/. v9_model/
 
-          echo "=============================="
           echo "正式模型檔案"
-          echo "=============================="
-
           ls -lh v9_model/
 
-          echo ""
-          echo "=============================="
           echo "正式模型 SHA256"
-          echo "=============================="
-
           cat v9_model/model_sha256.txt
 
           EXPECTED_MODEL_SHA="ece817275f2ab9790d62532cbe24af595b2b175485f01b26850a96c03848ed7b"
@@ -164,12 +158,13 @@ jobs:
           echo "Actual:   $ACTUAL_MODEL_SHA"
 
           if [ "$ACTUAL_MODEL_SHA" != "$EXPECTED_MODEL_SHA" ]; then
-            echo "V9 正式模型 SHA256 不一致，停止執行。"
+            echo "正式模型 SHA256 不一致，停止執行。"
             exit 1
           fi
 
-          echo "V9 正式模型 SHA256 驗證成功。"
+          echo "正式模型 SHA256 驗證成功。"
 
+      # 7. 檢查掃描程式
       - name: Validate V9 Python scripts
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
@@ -177,72 +172,31 @@ jobs:
           python -m py_compile v9_settle_paper_trades.py
           python -m py_compile v9_performance_report.py
 
-      # ======================================================
-      # 6. V9-3
-      # 先處理以前留下來的 Paper Trading
-      #
-      # WAIT_ENTRY
-      #     ↓
-      # WAIT_EXIT
-      #     ↓
-      # CLOSED
-      # ======================================================
+      # 8. 處理既有模擬交易
       - name: Settle existing paper trades
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          echo "======================================"
-          echo "開始處理既有 Paper Trading"
-          echo "======================================"
-
           python v9_settle_paper_trades.py
 
-      # ======================================================
-      # 7. V9-2
-      # 掃描最新完成的 1D K線
-      #
-      # AI >= 70%
-      # 才建立新的 WAIT_ENTRY
-      # ======================================================
+      # 9. 執行最新完成日 K 掃描
       - name: Run V9 paper trading scanner
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          echo "======================================"
-          echo "開始執行 V9 每日 AI 掃描"
-          echo "======================================"
-
           python v9_paper_trade.py
 
-      # ======================================================
-      # 8. V9-3
-      # Scanner 執行完成後再檢查一次
-      #
-      # 新訊號正常情況下不會立刻成交。
-      # 主要用途是增加漏跑/中斷後的恢復能力。
-      # ======================================================
+      # 10. 再次檢查模擬交易結算
       - name: Recheck paper trade settlement
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          echo "======================================"
-          echo "再次檢查 Paper Trading 結算"
-          echo "======================================"
-
           python v9_settle_paper_trades.py
 
-      # ======================================================
-      # 9. V9-4 自動更新 Forward Test 戰績
-      # ======================================================
+      # 11. 更新模擬交易績效
       - name: Build V9 performance report
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
-          echo "======================================"
-          echo "更新 V9 Forward Test 戰績"
-          echo "======================================"
-
           python v9_performance_report.py
 
-      # ======================================================
-      # 10. 把 Paper Trading 紀錄永久存回 GitHub
-      # ======================================================
+      # 12. 永久保存資料到 GitHub
       - name: Save paper trading history
         if: steps.daily-lock.outputs.skip != 'true'
         run: |
@@ -252,30 +206,30 @@ jobs:
           git add paper_trading/
 
           if git diff --cached --quiet; then
-            echo "======================================"
             echo "沒有新的 Paper Trading 資料需要 Commit"
-            echo "======================================"
             exit 0
           fi
 
-          echo "======================================"
-          echo "發現新的 Paper Trading 資料"
-          echo "準備寫回 GitHub"
-          echo "======================================"
-
           git commit -m "Update V9 paper trading data"
-
           git pull --rebase origin main
-
           git push origin main
 
-          echo "======================================"
           echo "Paper Trading 資料已成功寫回 GitHub"
-          echo "======================================"
 
-      # ======================================================
-      # 11. 同時保存 Artifact
-      # ======================================================
+      # 13. 傳送 LINE 通知
+      # 前面步驟成功才通知。
+      # 跳過重複掃描時，仍使用已保存資料補查通知。
+      - name: Send V10 LINE notification
+        if: success()
+        timeout-minutes: 12
+        env:
+          V10_NOTIFY_URL: ${{ secrets.V10_NOTIFY_URL }}
+          V10_NOTIFY_SECRET: ${{ secrets.V10_NOTIFY_SECRET }}
+          V10_SUMMARY_PATH: paper_trading/latest_summary.json
+        run: |
+          python notify_line.py
+
+      # 14. 保存 Artifact
       - name: Upload latest V9 report
         if: always() && steps.daily-lock.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
