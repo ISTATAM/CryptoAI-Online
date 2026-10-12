@@ -1,6 +1,6 @@
 {
   "version": "V9-4",
-  "updated_at_utc": "2026-10-11T05:57:36.531912+00:00",
+  "updated_at_utc": "2026-10-12T00:46:11.568544+00:00",
   "rules": {
     "initial_capital_usdt": 100.0,
     "max_positions_per_exit_time": 5,
@@ -10,7 +10,7 @@
   "total_signals": 18,
   "status_counts": {
     "CLOSED": 17,
-    "WAIT_ENTRY": 1
+    "WAIT_EXIT": 1
   },
   "closed_trades": 17,
   "performance_by_cost": {

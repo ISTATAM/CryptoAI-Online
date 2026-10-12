@@ -1,14 +1,14 @@
 {
   "version": "V9-3",
-  "settled_at_utc": "2026-10-11T05:57:36.188864+00:00",
+  "settled_at_utc": "2026-10-12T00:46:11.203889+00:00",
   "entry_updates": 0,
   "closed_updates": 0,
-  "waiting_entry": 1,
-  "waiting_exit": 0,
+  "waiting_entry": 0,
+  "waiting_exit": 1,
   "already_closed": 17,
   "status_counts": {
     "CLOSED": 17,
-    "WAIT_ENTRY": 1
+    "WAIT_EXIT": 1
   },
   "statistics": {
     "closed_trades": 17,

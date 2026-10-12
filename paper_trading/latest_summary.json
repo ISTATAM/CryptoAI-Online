@@ -1,76 +1,76 @@
 {
   "version": "V9-2",
-  "recorded_at_utc": "2026-10-11T05:55:15.384032+00:00",
+  "recorded_at_utc": "2026-10-12T00:43:22.967017+00:00",
   "interval": "1d",
   "threshold": 0.7,
-  "liquid_symbols": 179,
-  "successful_scans": 176,
+  "liquid_symbols": 185,
+  "successful_scans": 182,
   "failures": 3,
-  "new_signal_candidates": 1,
+  "new_signal_candidates": 0,
   "top_predictions": [
     {
-      "symbol": "STRAXUSDT",
-      "ai_score": 0.7084015361283459,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
+      "symbol": "TRXUSDT",
+      "ai_score": 0.627573425318293,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
+    },
+    {
+      "symbol": "KITEUSDT",
+      "ai_score": 0.6128662859488315,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
+    },
+    {
+      "symbol": "BICOUSDT",
+      "ai_score": 0.6087486461165333,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
+    },
+    {
+      "symbol": "HMSTRUSDT",
+      "ai_score": 0.5946985952520514,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
+    },
+    {
+      "symbol": "SNDKBUSDT",
+      "ai_score": 0.5527754437747308,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
+    },
+    {
+      "symbol": "CFGUSDT",
+      "ai_score": 0.5520960202668495,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
     },
     {
       "symbol": "YBUSDT",
-      "ai_score": 0.6989893750441069,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
+      "ai_score": 0.5473940014125114,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
     },
     {
-      "symbol": "ONEUSDT",
-      "ai_score": 0.6611092944351589,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
+      "symbol": "ENSUSDT",
+      "ai_score": 0.5428795796216284,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
     },
     {
-      "symbol": "HUMAUSDT",
-      "ai_score": 0.631635870598068,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
+      "symbol": "ARPAUSDT",
+      "ai_score": 0.5392756119929533,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
     },
     {
-      "symbol": "MSTRBUSDT",
-      "ai_score": 0.6287508113954673,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
-    },
-    {
-      "symbol": "LAYERUSDT",
-      "ai_score": 0.6231005953009612,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
-    },
-    {
-      "symbol": "ALGOUSDT",
-      "ai_score": 0.6166060048780214,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
-    },
-    {
-      "symbol": "USUALUSDT",
-      "ai_score": 0.6120307786134691,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
-    },
-    {
-      "symbol": "DASHUSDT",
-      "ai_score": 0.6085091309958878,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
-    },
-    {
-      "symbol": "ETCUSDT",
-      "ai_score": 0.6059436886035533,
-      "signal_open_time": "2026-10-10 00:00:00+00:00"
+      "symbol": "BTCUSDT",
+      "ai_score": 0.538722367742441,
+      "signal_open_time": "2026-10-11 00:00:00+00:00"
     }
   ],
   "failed_symbols": [
     {
       "symbol": "HYPEUSDT",
-      "error": "完整歷史 K 線不足：17"
-    },
-    {
-      "symbol": "牛来USDT",
-      "error": "完整歷史 K 線不足：32"
+      "error": "完整歷史 K 線不足：18"
     },
     {
       "symbol": "MARSCOINUSDT",
-      "error": "完整歷史 K 線不足：37"
+      "error": "完整歷史 K 線不足：38"
+    },
+    {
+      "symbol": "牛来USDT",
+      "error": "完整歷史 K 線不足：33"
     }
   ]
 }
