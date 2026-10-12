@@ -58,9 +58,11 @@ def main():
             url,
             data=payload,
             method="POST",
-            headers={
+                       headers={
                 "Authorization": f"Bearer {secret}",
                 "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "CryptoAI-V10-Notifier/1.0",
             },
         )
 
