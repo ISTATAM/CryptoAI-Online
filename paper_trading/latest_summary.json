@@ -1,10 +1,10 @@
 {
   "version": "V9-2",
-  "recorded_at_utc": "2026-10-12T00:43:22.967017+00:00",
+  "recorded_at_utc": "2026-10-12T01:00:36.241357+00:00",
   "interval": "1d",
   "threshold": 0.7,
-  "liquid_symbols": 185,
-  "successful_scans": 182,
+  "liquid_symbols": 187,
+  "successful_scans": 184,
   "failures": 3,
   "new_signal_candidates": 0,
   "top_predictions": [
