@@ -1,16 +1,17 @@
 {
   "version": "V9-4",
-  "updated_at_utc": "2026-10-22T04:59:36.202620+00:00",
+  "updated_at_utc": "2026-10-23T05:01:11.743990+00:00",
   "rules": {
     "initial_capital_usdt": 100.0,
     "max_positions_per_exit_time": 5,
     "position_fraction_of_starting_equity": 0.2,
     "note": "Forward paper-trading performance; not live executable fills."
   },
-  "total_signals": 86,
+  "total_signals": 89,
   "status_counts": {
     "CLOSED": 80,
-    "WAIT_ENTRY": 6
+    "WAIT_EXIT": 6,
+    "WAIT_ENTRY": 3
   },
   "closed_trades": 80,
   "performance_by_cost": {
