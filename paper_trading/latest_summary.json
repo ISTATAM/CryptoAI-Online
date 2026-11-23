@@ -1,76 +1,72 @@
 {
   "version": "V9-2",
-  "recorded_at_utc": "2026-11-22T06:59:43.210910+00:00",
+  "recorded_at_utc": "2026-11-23T07:49:32.553087+00:00",
   "interval": "1d",
   "threshold": 0.7,
-  "liquid_symbols": 130,
-  "successful_scans": 127,
-  "failures": 3,
-  "new_signal_candidates": 26,
+  "liquid_symbols": 131,
+  "successful_scans": 129,
+  "failures": 2,
+  "new_signal_candidates": 0,
   "top_predictions": [
     {
-      "symbol": "PUMPUSDT",
-      "ai_score": 0.7902608097315366,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
+      "symbol": "OPUSDT",
+      "ai_score": 0.6616405543519842,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
     },
     {
-      "symbol": "AAVEUSDT",
-      "ai_score": 0.7793870176918654,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "ASTERUSDT",
-      "ai_score": 0.7778669031887505,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "BTCUSDT",
-      "ai_score": 0.7772551497192763,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "ENAUSDT",
-      "ai_score": 0.7742704835505706,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "CRCLBUSDT",
-      "ai_score": 0.7735306986583632,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "AVAXUSDT",
-      "ai_score": 0.7699876911296752,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
-    },
-    {
-      "symbol": "FILUSDT",
-      "ai_score": 0.765960465465816,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
+      "symbol": "LTCUSDT",
+      "ai_score": 0.64600901473042,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
     },
     {
       "symbol": "PENGUUSDT",
-      "ai_score": 0.7639908969037775,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
+      "ai_score": 0.626387845391033,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
     },
     {
-      "symbol": "LDOUSDT",
-      "ai_score": 0.7512997032637359,
-      "signal_open_time": "2026-11-21 00:00:00+00:00"
+      "symbol": "MITOUSDT",
+      "ai_score": 0.6124762449825597,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "SHIBUSDT",
+      "ai_score": 0.6111302881310066,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "HBARUSDT",
+      "ai_score": 0.6079074498645094,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "DODOUSDT",
+      "ai_score": 0.6060561718168792,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "ai_score": 0.603251045065057,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "ALLOUSDT",
+      "ai_score": 0.6012653851947697,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
+    },
+    {
+      "symbol": "ARUSDT",
+      "ai_score": 0.5995459678972076,
+      "signal_open_time": "2026-11-22 00:00:00+00:00"
     }
   ],
   "failed_symbols": [
     {
-      "symbol": "HYPEUSDT",
-      "error": "完整歷史 K 線不足：59"
-    },
-    {
       "symbol": "RWUSDUSDT",
-      "error": "完整歷史 K 線不足：40"
+      "error": "完整歷史 K 線不足：41"
     },
     {
       "symbol": "ANTBUSDT",
-      "error": "完整歷史 K 線不足：3"
+      "error": "完整歷史 K 線不足：4"
     }
   ]
 }
