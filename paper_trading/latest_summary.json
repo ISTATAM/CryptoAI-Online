@@ -1,72 +1,72 @@
 {
   "version": "V9-2",
-  "recorded_at_utc": "2026-11-27T08:44:01.203712+00:00",
+  "recorded_at_utc": "2026-11-28T07:57:33.878920+00:00",
   "interval": "1d",
   "threshold": 0.7,
-  "liquid_symbols": 136,
-  "successful_scans": 134,
+  "liquid_symbols": 166,
+  "successful_scans": 164,
   "failures": 2,
-  "new_signal_candidates": 5,
+  "new_signal_candidates": 2,
   "top_predictions": [
     {
+      "symbol": "MMTUSDT",
+      "ai_score": 0.7888590289778988,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
+    },
+    {
+      "symbol": "RIFUSDT",
+      "ai_score": 0.7515396918282472,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
+    },
+    {
+      "symbol": "WLFIUSDT",
+      "ai_score": 0.6875669508930664,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
+    },
+    {
+      "symbol": "QIUSDT",
+      "ai_score": 0.6827841641408272,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
+    },
+    {
+      "symbol": "CFGUSDT",
+      "ai_score": 0.6656606297196326,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
+    },
+    {
       "symbol": "ACEUSDT",
-      "ai_score": 0.7578306497536645,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
+      "ai_score": 0.6653462957078357,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
     },
     {
-      "symbol": "KAVAUSDT",
-      "ai_score": 0.7485832474841356,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
+      "symbol": "WBETHUSDT",
+      "ai_score": 0.65009594373009,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
     },
     {
-      "symbol": "LAUSDT",
-      "ai_score": 0.7281260812938813,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
+      "symbol": "INITUSDT",
+      "ai_score": 0.6342219451143466,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
     },
     {
-      "symbol": "SKYUSDT",
-      "ai_score": 0.7157741293890887,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
+      "symbol": "COOKIEUSDT",
+      "ai_score": 0.6339282819845907,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
     },
     {
-      "symbol": "SNDKBUSDT",
-      "ai_score": 0.7037642688434235,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
-    },
-    {
-      "symbol": "APTUSDT",
-      "ai_score": 0.6871536540293195,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
-    },
-    {
-      "symbol": "VIRTUALUSDT",
-      "ai_score": 0.668769543003102,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
-    },
-    {
-      "symbol": "SSVUSDT",
-      "ai_score": 0.6574126235362127,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
-    },
-    {
-      "symbol": "SPKUSDT",
-      "ai_score": 0.6563932718659208,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
-    },
-    {
-      "symbol": "NBISBUSDT",
-      "ai_score": 0.6523024899763193,
-      "signal_open_time": "2026-11-26 00:00:00+00:00"
+      "symbol": "QQQBUSDT",
+      "ai_score": 0.6053043836560514,
+      "signal_open_time": "2026-11-27 00:00:00+00:00"
     }
   ],
   "failed_symbols": [
     {
       "symbol": "RWUSDUSDT",
-      "error": "完整歷史 K 線不足：45"
+      "error": "完整歷史 K 線不足：46"
     },
     {
       "symbol": "ANTBUSDT",
-      "error": "完整歷史 K 線不足：8"
+      "error": "完整歷史 K 線不足：9"
     }
   ]
 }
